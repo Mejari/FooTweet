@@ -1,0 +1,37 @@
+extends layout
+
+block content
+	div#account-form
+		form(method='post', action='')
+			label(for='name') Account Name:
+			input(type='text', name='name', id='name', value=account.name)
+			if !account.id
+				span - New!
+			br
+			label(for='searchString') Search Text:
+			input(type='text', name='searchString', id='searchString', value=account.searchString)
+			br
+			label(for='responseString') Response Text:
+			input(type='text', name='responseString', id='responseString', value=account.responseString)
+			input(type='text', name='id', id='id', value=account.id, hidden=true)
+			br
+			label(for='active') Enabled:
+			input(type='checkbox', name='active', id='active', checked=!account.id || account.active)
+			br
+			fieldset
+				legend Twitter Authentication Details
+				input(type='text', name='twitterAuthId', id='twitterAuthId', value=account.twitterAuthentication.id, hidden=true)
+				label(for='name') Consumer Key:
+				input(type='text', name='consumerKey', id='consumerKey', value=account.twitterAuthentication.consumerKey)
+				br
+				label(for='name') Consumer Key (Secret):
+				input(type='text', name='consumerSecret', id='consumerSecret', value=account.twitterAuthentication.consumerSecret)
+				br
+				label(for='name') Access Token Key:
+				input(type='text', name='accessTokenKey', id='accessTokenKey', value=account.twitterAuthentication.accessTokenKey)
+				br
+				label(for='name') Access Token Key (Secret):
+				input(type='text', name='accessTokenKeySecret', id='accessTokenKeySecret', value=account.twitterAuthentication.accessTokenKeySecret)
+			br
+			br
+			input(type='submit',name='submit',value='Save').submit-button

@@ -1,0 +1,12 @@
+extends layout
+
+block content
+	div
+		a(href='/accounts')='Manage Accounts'
+		span=' --- '
+		a(href='/root')='Root Settings'
+	div
+		h2 Latest Tweets
+		ul(id='latestTweets')
+			each tweet in latestTweets
+				li #{tweet.text}

@@ -1,0 +1,19 @@
+extends layout
+
+block content
+	div
+		h2='Currently Active Accounts'
+		if accounts.length > 0
+			ul(id='activeAccounts')
+				each account in accounts
+					li
+						a(href='/accounts/'+account.name) #{account.name}
+		else
+			span(style='margin-left:30px') No Active Accounts
+
+		if inactiveAccounts.length > 0
+			h2='Inactive Accounts'
+			ul(id='inactiveAccounts')
+				each account in inactiveAccounts
+					li
+						a(href='/accounts/'+account.name) #{account.name}
