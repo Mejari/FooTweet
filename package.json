@@ -8,7 +8,7 @@
     "express": "2.5.2",
     "jade": "0.20.0",
     "socket.io": "0.8.7",
-    "twit": "1.1.0",
+    "node-twitter-api": "1.1.0",
     "sequelize": "2.0.0-alpha3",
     "sequelize-mysql": "1.7.0-alpha2"
   },

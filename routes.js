@@ -19,11 +19,10 @@ var renderIndex = function(res, tweets) {
 }
 
 server.get('/', function(req,res){
-    accountManagementDao.getAccountForName("LactosTolerance", function(lactose) {
+    accountManagementDao.getAccountForName("StepOnALandMind", function(lactose) {
         if(lactose) {
-            twitterService.loadExistingTweetsIntoDB(lactose);
-            twitterService.searchTweets(lactose.searchString, lactose, function(result) {
-                renderIndex(res, result.statuses);
+            twitterService.searchTweets(lactose.searchString, lactose, function(statuses) {
+                renderIndex(res, statuses);
             });
         } else {
             renderIndex(res, [{text: 'HAMMY DOWN'}, {text: 'LACTOSE AND TOLERANT'}]);

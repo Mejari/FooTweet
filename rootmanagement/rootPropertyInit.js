@@ -10,15 +10,5 @@ var initRootProperties = function() {
 };
 
 module.exports = function() {
-    var executeWhenDbReady = function() {
-        if(db.conn.isSynchronized === true) {
-            initRootProperties();
-        } else {
-            setTimeout(function() {
-                executeWhenDbReady();
-            }, 1000);
-        }
-    };
-
-    executeWhenDbReady();;
+    require('../dbHelper').callbackWhenDbReady(initRootProperties);
 }();

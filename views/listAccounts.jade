@@ -8,6 +8,8 @@ block content
 				each account in accounts
 					li
 						a(href='/accounts/'+account.name) #{account.name}
+				li
+						a(href='/accounts/NEW') NEW
 		else
 			span(style='margin-left:30px') No Active Accounts
 

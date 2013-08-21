@@ -29,8 +29,8 @@ require('./testData');
 require('./rootmanagement/rootPropertyInit');
 
 //Setup Socket.IO
-var io = io.listen(server);
-io.sockets.on('connection', function(socket){
+var ioServer = io.listen(server);
+ioServer.sockets.on('connection', function(socket){
   console.log('Client Connected');
   socket.on('message', function(data){
     socket.broadcast.emit('server_message',data);
@@ -40,6 +40,20 @@ io.sockets.on('connection', function(socket){
     console.log('Client Disconnected.');
   });
 });
+
+//var accountManagementDao = require('./accountmanagement/accountManagementDao');
+//var twitterService = require('./tweeting/twitterService');
+//
+//var loadExistingTweetsForAllAccounts = function() {
+//    accountManagementDao.getActiveAccounts(function(accounts) {
+//        if(accounts) {
+//            accounts.forEach(function(account) {
+//                twitterService.loadExistingTweetsIntoDB(account);
+//            });
+//        }
+//    });
+//};
+//require('./dbHelper').callbackWhenDbReady(loadExistingTweetsForAllAccounts);
 
 require('./routes').setupRoutes(server);
 

@@ -1,9 +1,8 @@
-var Twit = require('twit'),
-    tweetDao = require('./tweetDao');
+var tweetDao = require('./tweetDao');
 
 var searchTweets = function(searchTerms, account, callback) {
-    var twit = createTwitForAccount(account);
-    twit.get('search/tweets', { q: searchTerms, count: 20 }, function(err, reply) {
+    var twit = account.getTwitter();
+    twit.search({ count: 20, q: searchTerms}, twit.access_token, twit.access_token_secret, function(err, data, response) {
         if(err) {
             twitterErrorHandler(err);
             return;
@@ -11,14 +10,38 @@ var searchTweets = function(searchTerms, account, callback) {
 
 //        require('./tweetDao').tweetAlreadyExistsForAccount(account, reply.statuses[0].text, function(){});
 
-        callback(reply);
+        callback(data.statuses);
     });
+};
+
+var respondToTweet = function(tweet, account, callback) {
+    var responseText = constructResponseTextForAccount(tweet, account);
+    var replyToId = tweet ? tweet.id_str : null;
+
+    var params = {
+        status: responseText,
+        in_reply_to_status_id: replyToId
+    };
+
+    var twit = account.getTwitter();
+
+    twit.statuses("update", params, twit.access_token, twit.access_token_secret, function(err, data, response) {
+        if(err) {
+            twitterErrorHandler(err);
+            return;
+        }
+
+        callback(data);
+    });
+};
+
+var constructResponseTextForAccount = function(tweet, account) {
+    return (tweet ? ('@'+tweet.user.screen_name+ ' ') : '') +account.responseString;
 };
 
 var db = GLOBAL.db;
 
 var loadExistingTweetsIntoDB = function(account) {
-    //TODO: THIS IS WRONG. STORE SOMETHING ELSE
     searchTweets('@'+account.name, account, function(result) {
         result.statuses.forEach(function(searchedTweet) {
             db.Tweet.create({
@@ -32,21 +55,14 @@ var loadExistingTweetsIntoDB = function(account) {
     });
 };
 
-var createTwitForAccount = function(account) {
-    var twitterAuthentication = account.twitterAuthentication;
-    return new Twit({
-        consumer_key:           twitterAuthentication.consumerKey
-        , consumer_secret:      twitterAuthentication.consumerSecret
-        , access_token:         twitterAuthentication.accessTokenKey
-        , access_token_secret:  twitterAuthentication.accessTokenKeySecret
-    });
-};
+
 
 var twitterErrorHandler = function(error) {
-    console.log(error);
+    console.log("Error calling twitter method: "+error);
 };
 
 module.exports = {
     searchTweets: searchTweets,
+    respondToTweet: respondToTweet,
     loadExistingTweetsIntoDB: loadExistingTweetsIntoDB
 };
