@@ -22,6 +22,7 @@ module.exports = function(sequelize, DataTypes) {
         name: { type: DataTypes.STRING, unique: true },
         active: { type: DataTypes.BOOLEAN, defaultValue: true },
         searchString: { type: DataTypes.STRING, allowNull: false },
+        ignoreString: DataTypes.STRING,
         responseString: {type: DataTypes.STRING(160), allowNull: false, validate: {
             len: [0,161]
         }}

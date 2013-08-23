@@ -2,36 +2,62 @@ var tweetDao = require('./tweetDao');
 
 var searchTweets = function(searchTerms, account, callback) {
     var twit = account.getTwitter();
-    twit.search({ count: 20, q: searchTerms}, twit.access_token, twit.access_token_secret, function(err, data, response) {
+    twit.search({ q: searchTerms}, twit.access_token, twit.access_token_secret, function(err, data) {
         if(err) {
-            twitterErrorHandler(err);
+            twitterErrorHandler(err, account);
             return;
         }
-
-//        require('./tweetDao').tweetAlreadyExistsForAccount(account, reply.statuses[0].text, function(){});
-
         callback(data.statuses);
+    });
+};
+
+var getTweetsForAccount = function(account, callback) {
+    var twit = account.getTwitter();
+    twit.getTimeline("user_timeline", {screen_name: account.name}, twit.access_token, twit.access_token_secret, function(err, data) {
+        if(err) {
+            twitterErrorHandler(err, account);
+            return;
+        }
+        callback(data);
     });
 };
 
 var respondToTweet = function(tweet, account, callback) {
     var responseText = constructResponseTextForAccount(tweet, account);
-    var replyToId = tweet ? tweet.id_str : null;
 
-    var params = {
-        status: responseText,
-        in_reply_to_status_id: replyToId
-    };
+    //Don't ever tweet the same thing to the same person
+    tweetDao.tweetAlreadyExistsForAccount(account, tweet, function(tweetAlreadyExists) {
+        if(tweetAlreadyExists === false) {
+            var replyToId = tweet ? tweet.id_str : null;
 
-    var twit = account.getTwitter();
+            var params = {
+                status: responseText,
+                in_reply_to_status_id: replyToId
+            };
 
-    twit.statuses("update", params, twit.access_token, twit.access_token_secret, function(err, data, response) {
-        if(err) {
-            twitterErrorHandler(err);
-            return;
+            var twit = account.getTwitter();
+
+            if(true) {
+                console.log("BYPASSING. WOULD HAVE TWEETED: "+responseText);
+                if(callback) {
+                    callback({});
+                }
+                return;
+            }
+            twit.statuses("update", params, twit.access_token, twit.access_token_secret, function(err, data, response) {
+                if(err) {
+                    twitterErrorHandler(err, account);
+                    return;
+                }
+
+                if(callback) {
+                    //TODO: SAVE TWEET TO DB
+                    callback(data);
+                }
+            });
+        } else {
+            console.log('Skipping Tweet, already Tweeted: '+responseText);
         }
-
-        callback(data);
     });
 };
 
@@ -39,26 +65,27 @@ var constructResponseTextForAccount = function(tweet, account) {
     return (tweet ? ('@'+tweet.user.screen_name+ ' ') : '') +account.responseString;
 };
 
-var db = GLOBAL.db;
-
-var loadExistingTweetsIntoDB = function(account) {
-    searchTweets('@'+account.name, account, function(result) {
-        result.statuses.forEach(function(searchedTweet) {
-            db.Tweet.create({
-                text: searchedTweet.text
-            }).success(function(tweet){
-                tweet.setAccount(account);
-            }).error(function(err){
-                console.log(err);
+var loadExistingTweetsIntoDB = function(account, callback) {
+    getTweetsForAccount(account, function(statuses) {
+        if(statuses) {
+            var numTweets = statuses.length;
+            var numSaved = 0;
+            var saveCallback = function() {
+                numSaved++;
+                if(numSaved >= numTweets) {
+                    callback();
+                }
+            };
+            statuses.forEach(function(searchedTweet) {
+                var userScreenName = searchedTweet.text.indexOf('@') == 0 ? (searchedTweet.text.split(' ')[0].substr(1)) : null;
+                tweetDao.saveTweet(userScreenName, account, saveCallback, saveCallback);
             });
-        });
+        }
     });
 };
 
-
-
-var twitterErrorHandler = function(error) {
-    console.log("Error calling twitter method: "+error);
+var twitterErrorHandler = function(error, account) {
+    console.log("Error calling twitter method: "+error.statusCode+' for account: '+account.name+' --- '+error.data);
 };
 
 module.exports = {

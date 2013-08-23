@@ -8,8 +8,11 @@ block content
 			if !account.id
 				span - New!
 			br
-			label(for='searchString') Search Text:
+			label(for='searchString') Search Text (comma separated):
 			input(type='text', name='searchString', id='searchString', value=account.searchString)
+			br
+			label(for='ignoreString') Ignore Text (comma separated):
+			input(type='text', name='ignoreString', id='ignoreString', value=account.ignoreString)
 			br
 			label(for='responseString') Response Text:
 			input(type='text', name='responseString', id='responseString', value=account.responseString)

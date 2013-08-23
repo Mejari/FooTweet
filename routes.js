@@ -30,6 +30,19 @@ server.get('/', function(req,res){
     });
 });
 
+server.get('/start', function(req,res){
+    require('./tweeting/automaticTwitterService').startAutomaticTweetsForActiveAccounts();
+    accountManagementDao.getAccountForName("StepOnALandMind", function(lactose) {
+        if(lactose) {
+            twitterService.searchTweets(lactose.searchString, lactose, function(statuses) {
+                renderIndex(res, statuses);
+            });
+        } else {
+            renderIndex(res, [{text: 'HAMMY DOWN'}, {text: 'LACTOSE AND TOLERANT'}]);
+        }
+    });
+});
+
 var renderRootPropertiesForm = function(res) {
     rootManagementDao.getRootProperties(function(rootProperties) {
         res.render('rootManagement.jade', {

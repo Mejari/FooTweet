@@ -1,13 +1,25 @@
 var db = GLOBAL.db;
 
-var saveTweets = function(tweets) {
-    db.Tweet.bulkCreate(tweets);
+var saveTweet = function(userScreenName, account, callback, errorCallback) {
+    db.Tweet.create({
+        targetUser: userScreenName
+    }).success(function(tweet){
+        tweet.setAccount(account).success(function() {
+            callback();
+        }).error(function(err) {
+            console.log(err);
+            errorCallback(err);
+        });
+    }).error(function(err){
+        console.log(err);
+        errorCallback(err);
+    });
 };
 
-var tweetAlreadyExistsForAccount = function(account, tweetText, callback) {
+var tweetAlreadyExistsForAccount = function(account, tweet, callback) {
     db.Tweet.count({
         where: {
-            text: tweetText,
+            targetUser: tweet.user.screen_name,
             AccountId: account.id
         }
     }).success(function(numTweets) {
@@ -16,6 +28,6 @@ var tweetAlreadyExistsForAccount = function(account, tweetText, callback) {
 };
 
 module.exports = {
-    saveTweets: saveTweets,
+    saveTweet: saveTweet,
     tweetAlreadyExistsForAccount: tweetAlreadyExistsForAccount
 }

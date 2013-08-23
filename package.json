@@ -10,7 +10,8 @@
     "socket.io": "0.8.7",
     "node-twitter-api": "1.1.0",
     "sequelize": "2.0.0-alpha3",
-    "sequelize-mysql": "1.7.0-alpha2"
+    "sequelize-mysql": "1.7.0-alpha2",
+    "cron": "1.0.1"
   },
   "devDependencies": {
     "vows": "0.5.x",

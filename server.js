@@ -41,20 +41,6 @@ ioServer.sockets.on('connection', function(socket){
   });
 });
 
-//var accountManagementDao = require('./accountmanagement/accountManagementDao');
-//var twitterService = require('./tweeting/twitterService');
-//
-//var loadExistingTweetsForAllAccounts = function() {
-//    accountManagementDao.getActiveAccounts(function(accounts) {
-//        if(accounts) {
-//            accounts.forEach(function(account) {
-//                twitterService.loadExistingTweetsIntoDB(account);
-//            });
-//        }
-//    });
-//};
-//require('./dbHelper').callbackWhenDbReady(loadExistingTweetsForAllAccounts);
-
 require('./routes').setupRoutes(server);
 
 console.log('Listening on http://0.0.0.0:' + port );
