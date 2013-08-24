@@ -39,16 +39,20 @@ var getAccountForName = function(accountName, callback) {
 
 var createOrUpdateAccount = function(accountInfo, callback) {
     var createOrUpdateTwitterAuth = function(twitterAuth, callback) {
-        if(twitterAuth.id) {
-            db.TwitterAuthentication.find(twitterAuth.id).success(function(existingAuth){
+        if(twitterAuth) {
+            if(twitterAuth.id) {
+                db.TwitterAuthentication.find(twitterAuth.id).success(function(existingAuth){
+                    delete twitterAuth.id;
+                    existingAuth.updateAttributes(twitterAuth).success(function() {
+                        callback(existingAuth)
+                    });
+                }).error(function(error){console.log(error);});
+            } else {
                 delete twitterAuth.id;
-                existingAuth.updateAttributes(twitterAuth).success(function() {
-                    callback(existingAuth)
-                });
-            }).error(function(error){console.log(error);});
+                db.TwitterAuthentication.create(twitterAuth).success(callback).error(function(error){console.log(error);});
+            }
         } else {
-            delete twitterAuth.id;
-            db.TwitterAuthentication.create(twitterAuth).success(callback).error(function(error){console.log(error);});
+            callback(null);
         }
     };
 
@@ -65,16 +69,22 @@ var createOrUpdateAccount = function(accountInfo, callback) {
             delete account.twitterAuthentication;
             delete account.id;
             db.Account.create(account).success(function(newAccount) {
+                if(twitterAuth) {
                 newAccount.setTwitterAuthentication(twitterAuth).success(function() {
                     callback(newAccount);
                 });
+                } else {
+                    callback(newAccount);
+                }
             }).error(function(error){console.log(error);});
         }
     }
 
     createOrUpdateTwitterAuth(accountInfo.twitterAuthentication, function(twitterAuth) {
         createOrUpdateAccount(accountInfo, twitterAuth, function(account) {
-            callback(account);
+            if(callback) {
+                callback(account);
+            }
         });
     });
 };

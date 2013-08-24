@@ -2,8 +2,6 @@ var db = GLOBAL.db;
 
 var insertData = function() {
 
-
-
 //    db.TwitterAuthentication.create({
 //        consumerKey: 'RAWRAWRAWR',
 //        consumerSecret: 'lawlawlawl',

@@ -25,7 +25,8 @@ module.exports = function(sequelize, DataTypes) {
         ignoreString: DataTypes.STRING,
         responseString: {type: DataTypes.STRING(160), allowNull: false, validate: {
             len: [0,161]
-        }}
+        }},
+        lastTweetId: DataTypes.STRING
     }, {
         instanceMethods: {
             getTwitter: function() {

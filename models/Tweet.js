@@ -1,8 +1,7 @@
 module.exports = function(sequelize, DataTypes) {
     var Account = sequelize.getModel("Account");
     var Tweet = sequelize.define('Tweet', {
-        id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-        targetUser: { type: DataTypes.STRING, allowNull: false }
+        targetUser: { type: DataTypes.STRING, allowNull: false, primaryKey: true }
     });
 
     Account.hasMany(Tweet);//, {onDelete: 'cascade', onUpdate: 'cascade'});

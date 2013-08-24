@@ -2,7 +2,16 @@ var tweetDao = require('./tweetDao');
 
 var searchTweets = function(searchTerms, account, callback) {
     var twit = account.getTwitter();
-    twit.search({ q: searchTerms}, twit.access_token, twit.access_token_secret, function(err, data) {
+    var searchParams = {
+        q: searchTerms,
+        result_type: 'recent',
+        count: 50,
+        include_entities: false
+    };
+    if(account.lastTweetId) {
+        searchParams.since_id = account.lastTweetId;
+    }
+    twit.search(searchParams, twit.access_token, twit.access_token_secret, function(err, data) {
         if(err) {
             twitterErrorHandler(err, account);
             return;
@@ -39,19 +48,24 @@ var respondToTweet = function(tweet, account, callback) {
 
             if(true) {
                 console.log("BYPASSING. WOULD HAVE TWEETED: "+responseText);
+                var userScreenName = getMentionedUsernameFromTweet({text:responseText});
+                tweetDao.saveTweet(userScreenName, account);
                 if(callback) {
                     callback({});
                 }
                 return;
             }
-            twit.statuses("update", params, twit.access_token, twit.access_token_secret, function(err, data, response) {
+            twit.statuses("update", params, twit.access_token, twit.access_token_secret, function(err, data) {
                 if(err) {
                     twitterErrorHandler(err, account);
                     return;
                 }
 
+                console.log(account.name +' Tweeted: '+responseText);
+
                 if(callback) {
-                    //TODO: SAVE TWEET TO DB
+                    var userScreenName = getMentionedUsernameFromTweet({text:responseText});
+                    tweetDao.saveTweet(userScreenName, account);
                     callback(data);
                 }
             });
@@ -77,11 +91,15 @@ var loadExistingTweetsIntoDB = function(account, callback) {
                 }
             };
             statuses.forEach(function(searchedTweet) {
-                var userScreenName = searchedTweet.text.indexOf('@') == 0 ? (searchedTweet.text.split(' ')[0].substr(1)) : null;
+                var userScreenName = getMentionedUsernameFromTweet(searchedTweet);
                 tweetDao.saveTweet(userScreenName, account, saveCallback, saveCallback);
             });
         }
     });
+};
+
+var getMentionedUsernameFromTweet = function(tweet) {
+    return tweet.text.indexOf('@') == 0 ? (tweet.text.split(' ')[0].substr(1)) : null;
 };
 
 var twitterErrorHandler = function(error, account) {

@@ -23,8 +23,9 @@ server.listen(port);
 var db = require('./storage/DatabaseConnection');
 
 GLOBAL.db = db;
+GLOBAL.debug_sequelize_enabled = false;
 
-require('./testData');
+//require('./testData');
 
 require('./rootmanagement/rootPropertyInit');
 

@@ -5,14 +5,20 @@ var saveTweet = function(userScreenName, account, callback, errorCallback) {
         targetUser: userScreenName
     }).success(function(tweet){
         tweet.setAccount(account).success(function() {
-            callback();
+            if(callback) {
+                callback();
+            }
         }).error(function(err) {
             console.log(err);
-            errorCallback(err);
+            if(errorCallback) {
+                errorCallback(err);
+            }
         });
     }).error(function(err){
         console.log(err);
-        errorCallback(err);
+        if(errorCallback) {
+            errorCallback(err);
+        }
     });
 };
 

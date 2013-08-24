@@ -21,7 +21,12 @@ var setupDbConnection = function() {
     //Setup Database
     var sequelize = new Sequelize(db_config.dbName, db_config.user, db_config.password, {
         host: db_config.host,
-        dialect: 'mysql'
+        dialect: 'mysql',
+        logging: function(statementToLog) {
+            if(GLOBAL.debug_sequelize_enabled === true) {
+                console.log(statementToLog);
+            }
+        }
     });
 
     extendSequelize(sequelize);
@@ -34,7 +39,7 @@ var extendSequelize = function(sequelize) {
 };
 
 var syncModels = function(sequelize) {
-    sequelize.sync({force: true}).success(function() {
+    sequelize.sync({/*force: true*/}).success(function() {
         sequelize.isSynchronized = true;
     }).error(function(error){
         console.log('Error syncing db model: '+error);

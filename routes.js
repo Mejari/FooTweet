@@ -1,7 +1,8 @@
 var NotFound = require('./NotFound'),
     accountManagementDao = require('./accountmanagement/accountManagementDao'),
     rootManagementDao = require('./rootmanagement/rootManagementDao'),
-    twitterService = require('./tweeting/twitterService');
+    twitterService = require('./tweeting/twitterService'),
+    automaticTwitterService = require('./tweeting/automaticTwitterService');
 var setupRoutes = function(server) {
 ///////////////////////////////////////////
 //              Routes                   //
@@ -21,7 +22,7 @@ var renderIndex = function(res, tweets) {
 server.get('/', function(req,res){
     accountManagementDao.getAccountForName("StepOnALandMind", function(lactose) {
         if(lactose) {
-            twitterService.searchTweets(lactose.searchString, lactose, function(statuses) {
+            twitterService.searchTweets('" '+lactose.searchString+' "', lactose, function(statuses) {
                 renderIndex(res, statuses);
             });
         } else {
@@ -34,7 +35,7 @@ server.get('/start', function(req,res){
     require('./tweeting/automaticTwitterService').startAutomaticTweetsForActiveAccounts();
     accountManagementDao.getAccountForName("StepOnALandMind", function(lactose) {
         if(lactose) {
-            twitterService.searchTweets(lactose.searchString, lactose, function(statuses) {
+            twitterService.searchTweets('" '+lactose.searchString+' "', lactose, function(statuses) {
                 renderIndex(res, statuses);
             });
         } else {
@@ -113,6 +114,9 @@ server.post('/accounts/:accountName', function(req, res) {
     };
 
     accountManagementDao.createOrUpdateAccount(accountInfo, function(savedAccount) {
+        accountManagementDao.getAccountForName(savedAccount.name, function(account) {
+            automaticTwitterService.restartAutomaticTweetsForAccount(account);
+        });
         renderAccountInfoForm(savedAccount.name, res);
     });
 });
