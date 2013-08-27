@@ -1,23 +1,22 @@
 var Twit = require('node-twitter-api');
 
 var createTwitForAccount = function(account) {
-    var twitterAuthentication = account.twitterAuthentication;
     var twitter = null;
-    if(twitterAuthentication) {
+    if(account) {
         twitter = new Twit({
-            consumerKey:           twitterAuthentication.consumerKey
-            , consumerSecret:      twitterAuthentication.consumerSecret
+            consumerKey:           account.consumerKey
+            , consumerSecret:      account.consumerSecret
             ,callback: null
         });
-        twitter.access_token=twitterAuthentication.accessTokenKey;
-        twitter.access_token_secret=twitterAuthentication.accessTokenKeySecret;
+        twitter.access_token=account.accessTokenKey;
+        twitter.access_token_secret=account.accessTokenKeySecret;
     }
     return twitter;
 };
 
 module.exports = function(sequelize, DataTypes) {
-    var TwitterAuthentication = sequelize.getModel("TwitterAuthentication");
     var Account = sequelize.define('Account', {
+        //Details About the Account
         id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
         name: { type: DataTypes.STRING, unique: true },
         active: { type: DataTypes.BOOLEAN, defaultValue: true },
@@ -26,7 +25,13 @@ module.exports = function(sequelize, DataTypes) {
         responseString: {type: DataTypes.STRING(160), allowNull: false, validate: {
             len: [0,161]
         }},
-        lastTweetId: DataTypes.STRING
+        //Details About The Account's Activity in the System
+        lastTweetId: DataTypes.STRING,
+        //Details About the Twitter Authentication for the Account
+        consumerKey: DataTypes.STRING,
+        consumerSecret: DataTypes.STRING,
+        accessTokenKey: DataTypes.STRING,
+        accessTokenKeySecret: DataTypes.STRING
     }, {
         instanceMethods: {
             getTwitter: function() {
@@ -37,8 +42,5 @@ module.exports = function(sequelize, DataTypes) {
             }
         }
     });
-
-    Account.belongsTo(TwitterAuthentication);//, {onDelete: 'cascade', onUpdate: 'cascade'});
-
     return Account;
 };

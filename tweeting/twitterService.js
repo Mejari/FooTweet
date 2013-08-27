@@ -31,7 +31,22 @@ var getTweetsForAccount = function(account, callback) {
     });
 };
 
+var tweetResponseCallback = function(data, account, callback) {
+    if(data) {
+        var responseText = data.text;
+        if(GLOBAL.debug_tweets) {
+            console.log(account.name +' Tweeted: '+responseText);
+        }
+
+        var userScreenName = getMentionedUsernameFromTweet({text:responseText});
+        tweetDao.saveTweet(userScreenName, account);
+    }
+    callback(data);
+};
+
+
 var respondToTweet = function(tweet, account, callback) {
+    callback = callback || function(){};
     var responseText = constructResponseTextForAccount(tweet, account);
 
     //Don't ever tweet the same thing to the same person
@@ -46,31 +61,23 @@ var respondToTweet = function(tweet, account, callback) {
 
             var twit = account.getTwitter();
 
-            if(true) {
-                console.log("BYPASSING. WOULD HAVE TWEETED: "+responseText);
-                var userScreenName = getMentionedUsernameFromTweet({text:responseText});
-                tweetDao.saveTweet(userScreenName, account);
-                if(callback) {
-                    callback({});
-                }
-                return;
+            if(GLOBAL.debug_tweets === true) {
+                console.log("DEBUGGING, SKIPPING ACTUAL TWEETING");
+                tweetResponseCallback({text: responseText}, account, callback);
+
+            } else {
+                twit.statuses("update", params, twit.access_token, twit.access_token_secret, function(err, data) {
+                    if(err) {
+                        twitterErrorHandler(err, account);
+                        return;
+                    }
+                    tweetResponseCallback(data, account, callback);
+                });
             }
-            twit.statuses("update", params, twit.access_token, twit.access_token_secret, function(err, data) {
-                if(err) {
-                    twitterErrorHandler(err, account);
-                    return;
-                }
-
-                console.log(account.name +' Tweeted: '+responseText);
-
-                if(callback) {
-                    var userScreenName = getMentionedUsernameFromTweet({text:responseText});
-                    tweetDao.saveTweet(userScreenName, account);
-                    callback(data);
-                }
-            });
         } else {
-            console.log('Skipping Tweet, already Tweeted: '+responseText);
+            if(GLOBAL.debug_tweets) {
+                console.log('Skipping Tweet, already Tweeted: '+responseText);
+            }
         }
     });
 };

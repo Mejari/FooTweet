@@ -24,8 +24,10 @@ var TwitterJob = (function() {
                 searchString += '-"'+ignoreStringArr[i].trim()+' " ';
             }
         }
-        searchString += ' -RT';
-        console.log("Search String for " + account.name + ": "+searchString);
+        searchString += ' -RT';//Never respond to a re-tweet. This might be pulled out into a root property later
+        if(GLOBAL.debug_tweets) {
+            console.log("Search String for " + account.name + ": "+searchString);
+        }
 
         return encodeSearchString(searchString);
 
@@ -43,7 +45,9 @@ var TwitterJob = (function() {
 
     function create( account ) {
         var runJob = function() {
-            console.log('Running sync for account: '+account.name);
+            if(GLOBAL.debug_tweets) {
+                console.log('Running sync for account: '+account.name);
+            }
             twitterService.searchTweets(this.searchString, account, handleSearchResults.bind(this));
         };
 
@@ -65,6 +69,9 @@ var TwitterJob = (function() {
             this.stop();
             this.intervalId = setInterval(runJob.bind(this), this.minutes*60*1000);
             accountManagement.createOrUpdateAccount({id: account.id, lastTweetId: maxId});
+            if(GLOBAL.debug_tweets) {
+                console.log('Sync complete for account: '+account.name);
+            }
         };
 
         return {

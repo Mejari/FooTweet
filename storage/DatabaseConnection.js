@@ -18,6 +18,14 @@ var setupDbConnection = function() {
             db_config[keyValue[0]] = keyValue[1];
         }
     }
+
+    if(GLOBAL.debug_tweets === true) {
+        console.log("Config Data:");
+        Object.keys(db_config).forEach(function(key) {
+            console.log(key+": "+db_config[key]);
+        });
+    }
+
     //Setup Database
     var sequelize = new Sequelize(db_config.dbName, db_config.user, db_config.password, {
         host: db_config.host,
@@ -54,14 +62,10 @@ var importModel = function(conn, modelName) {
 var populateDbModels = function(conn) {
     return {
         RootProperties: importModel(conn, "RootProperties"),
-        TwitterAuthentication: importModel(conn, "TwitterAuthentication"),
         Account: importModel(conn, "Account"),
-        Tweet: importModel(conn, "Tweet")
+        TweetedUser: importModel(conn, "TweetedUser")
     };
 };
-
-
-
 
 var conn = setupDbConnection();
 var exports = populateDbModels(conn);

@@ -1,7 +1,13 @@
+//DEBUG OPTIONS
+GLOBAL.debug_sequelize_enabled = false;//Default: false
+GLOBAL.debug_tweets = true;//Default: false
+//END DEBUG OPTIONS
+
+GLOBAL.db = require('./storage/DatabaseConnection');
+
 //setup Dependencies
 var connect = require('connect')
     , express = require('express')
-    , io = require('socket.io')
     , port = (process.env.PORT || 8081);
 
 //Setup Express
@@ -17,31 +23,12 @@ server.configure(function(){
 });
 
 require('./errors').setupErrorHandlers(server);
-
+require('./routes').setupRoutes(server);
 server.listen(port);
 
-var db = require('./storage/DatabaseConnection');
+require('./dbHelper').callbackWhenDbReady(function() {
+    require('./rootmanagement/rootPropertyInit');
+    require('./tweeting/automaticTwitterService').startAutomaticTweetsForActiveAccounts();
 
-GLOBAL.db = db;
-GLOBAL.debug_sequelize_enabled = false;
-
-//require('./testData');
-
-require('./rootmanagement/rootPropertyInit');
-
-//Setup Socket.IO
-var ioServer = io.listen(server);
-ioServer.sockets.on('connection', function(socket){
-  console.log('Client Connected');
-  socket.on('message', function(data){
-    socket.broadcast.emit('server_message',data);
-    socket.emit('server_message',data);
-  });
-  socket.on('disconnect', function(){
-    console.log('Client Disconnected.');
-  });
+    console.log('Listening on http://0.0.0.0:' + port );
 });
-
-require('./routes').setupRoutes(server);
-
-console.log('Listening on http://0.0.0.0:' + port );

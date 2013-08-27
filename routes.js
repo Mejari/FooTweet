@@ -8,38 +8,14 @@ var setupRoutes = function(server) {
 //              Routes                   //
 ///////////////////////////////////////////
 
-var renderIndex = function(res, tweets) {
-    res.render('index.jade', {
-        locals : {
-            latestTweets: tweets
-            ,title : 'FooTweet'
-            ,description: 'Tweet Anything'
-            ,author: 'Mejari'
-        }
-    });
-}
 
 server.get('/', function(req,res){
-    accountManagementDao.getAccountForName("StepOnALandMind", function(lactose) {
-        if(lactose) {
-            twitterService.searchTweets('" '+lactose.searchString+' "', lactose, function(statuses) {
-                renderIndex(res, statuses);
-            });
-        } else {
-            renderIndex(res, [{text: 'HAMMY DOWN'}, {text: 'LACTOSE AND TOLERANT'}]);
-        }
-    });
-});
-
-server.get('/start', function(req,res){
-    require('./tweeting/automaticTwitterService').startAutomaticTweetsForActiveAccounts();
-    accountManagementDao.getAccountForName("StepOnALandMind", function(lactose) {
-        if(lactose) {
-            twitterService.searchTweets('" '+lactose.searchString+' "', lactose, function(statuses) {
-                renderIndex(res, statuses);
-            });
-        } else {
-            renderIndex(res, [{text: 'HAMMY DOWN'}, {text: 'LACTOSE AND TOLERANT'}]);
+    //TODO: Figure out what to display on the main page
+    res.render('index.jade', {
+        locals : {
+            title : 'FooTweet'
+            ,description: 'Tweet Anything'
+            ,author: 'Mejari'
         }
     });
 });
@@ -49,7 +25,7 @@ var renderRootPropertiesForm = function(res) {
         res.render('rootManagement.jade', {
             locals : {
                 properties: rootProperties
-                ,title : 'FooTweet'
+                ,title : 'FooTweet - Root Properties'
                 ,description: 'Tweet Anything'
                 ,author: 'Mejari'
                 ,backHref: '/'
@@ -78,7 +54,7 @@ var renderAccountInfoForm = function(accountName, res) {
         res.render('updateAccountForm.jade', {
             locals : {
                 title : 'FooTweet - ' + (account ? account.name : 'new')
-                ,account: account || {name: accountName, twitterAuthentication: {}}
+                ,account: account || {name: accountName}
                 ,description: 'Tweet Anything'
                 ,author: 'Mejari'
                 ,backHref: '/accounts'
@@ -96,21 +72,17 @@ server.get('/accounts/:accountName', function(req, res){
 server.post('/accounts/:accountName', function(req, res) {
     var values = req.body;
 
-    var twitterAuthInfo = {
-        id: values.twitterAuthId,
-        consumerKey: values.consumerKey,
-        consumerSecret: values.consumerSecret,
-        accessTokenKey: values.accessTokenKey,
-        accessTokenKeySecret: values.accessTokenKeySecret
-    };
-
     var accountInfo = {
         id: values.id,
         name: values.name,
         searchString: values.searchString,
         responseString: values.responseString,
+        ignoreString: values.ignoreString,
         active: values.active == 'on',
-        twitterAuthentication: twitterAuthInfo
+        consumerKey: values.consumerKey,
+        consumerSecret: values.consumerSecret,
+        accessTokenKey: values.accessTokenKey,
+        accessTokenKeySecret: values.accessTokenKeySecret
     };
 
     accountManagementDao.createOrUpdateAccount(accountInfo, function(savedAccount) {
@@ -127,7 +99,7 @@ server.get('/accounts', function(req, res){
         accountManagementDao.getDisabledAccounts(function(inactiveAccounts) {
             res.render('listAccounts.jade', {
                 locals : {
-                    title : 'FooTweet - Active Accounts'
+                    title : 'FooTweet - Accounts'
                     ,accounts: accounts
                     ,inactiveAccounts: inactiveAccounts
                     ,description: 'Tweet Anything'
@@ -140,15 +112,15 @@ server.get('/accounts', function(req, res){
 });
 
 
-//A Route for Creating a 500 Error (Useful to keep around)
-    server.get('/500', function(req, res){
-        throw new Error('This is a 500 Error');
-    });
+//A Route for Creating a 500 Error
+server.get('/500', function(req, res){
+    throw new Error('This is a 500 Error');
+});
 
-//The 404 Route (ALWAYS Keep this as the last route)
-    server.get('/*', function(req, res){
-        throw new NotFound;
-    });
+//The 404 Route
+server.get('/*', function(req, res){
+    throw new NotFound;
+});
 }
 
 module.exports = {setupRoutes: setupRoutes};

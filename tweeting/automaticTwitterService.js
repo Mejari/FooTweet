@@ -1,6 +1,7 @@
 var accountManagementDao = require('../accountmanagement/accountManagementDao'),
     twitterService = require('./twitterService'),
-    TweetJob = require('./TweetJob.js');
+    TweetJob = require('./TweetJob'),
+    dbHelper = require('../dbHelper');
 
 var ACTIVE_TWEET_JOBS = {};
 
@@ -8,6 +9,7 @@ var restartAutomaticTweetsForAccount = function(account) {
     var accountTweetJob = ACTIVE_TWEET_JOBS[account.name];
     if(accountTweetJob) {
         accountTweetJob.stop();
+        delete ACTIVE_TWEET_JOBS[account.name];
     }
     startAutomaticTweetsForAccount(account);
 }
@@ -21,12 +23,14 @@ var startAutomaticTweetsForAccount = function(account) {
 };
 
 var startAutomaticTweetsForActiveAccounts = function() {
-    accountManagementDao.getActiveAccounts(function(accounts) {
-        if(accounts) {
-            accounts.forEach(function(account) {
-                startAutomaticTweetsForAccount(account);
-            });
-        }
+    dbHelper.callbackWhenDbReady(function() {
+        accountManagementDao.getActiveAccounts(function(accounts) {
+            if(accounts) {
+                accounts.forEach(function(account) {
+                    startAutomaticTweetsForAccount(account);
+                });
+            }
+        });
     });
 };
 

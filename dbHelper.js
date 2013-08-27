@@ -1,9 +1,8 @@
 var db = GLOBAL.db;
 
 var callbackWhenDbReady = function(callback) {
-
     var executeWhenDbReady = function() {
-        if(db.conn.isSynchronized === true) {
+        if(db && db.conn.isSynchronized === true) {
             callback();
         } else {
             setTimeout(function() {

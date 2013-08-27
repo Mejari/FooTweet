@@ -23,18 +23,17 @@ block content
 			br
 			fieldset
 				legend Twitter Authentication Details
-				input(type='text', name='twitterAuthId', id='twitterAuthId', value=account.twitterAuthentication.id, hidden=true)
 				label(for='name') Consumer Key:
-				input(type='text', name='consumerKey', id='consumerKey', value=account.twitterAuthentication.consumerKey)
+				input(type='text', name='consumerKey', id='consumerKey', value=account.consumerKey)
 				br
 				label(for='name') Consumer Key (Secret):
-				input(type='text', name='consumerSecret', id='consumerSecret', value=account.twitterAuthentication.consumerSecret)
+				input(type='text', name='consumerSecret', id='consumerSecret', value=account.consumerSecret)
 				br
 				label(for='name') Access Token Key:
-				input(type='text', name='accessTokenKey', id='accessTokenKey', value=account.twitterAuthentication.accessTokenKey)
+				input(type='text', name='accessTokenKey', id='accessTokenKey', value=account.accessTokenKey)
 				br
 				label(for='name') Access Token Key (Secret):
-				input(type='text', name='accessTokenKeySecret', id='accessTokenKeySecret', value=account.twitterAuthentication.accessTokenKeySecret)
+				input(type='text', name='accessTokenKeySecret', id='accessTokenKeySecret', value=account.accessTokenKeySecret)
 			br
 			br
 			input(type='submit',name='submit',value='Save').submit-button
