@@ -10,7 +10,6 @@ var setupRoutes = function(server) {
 
 
 server.get('/', function(req,res){
-    //TODO: Figure out what to display on the main page
     res.render('index.jade', {
         locals : {
             title : 'FooTweet'

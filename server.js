@@ -24,7 +24,11 @@ server.configure(function(){
 
 require('./errors').setupErrorHandlers(server);
 require('./routes').setupRoutes(server);
+
 server.listen(port);
+
+GLOBAL.twitterIo = require('socket.io').listen(server);
+GLOBAL.twitterIo.set('log level', 1);
 
 require('./dbHelper').callbackWhenDbReady(function() {
     require('./rootmanagement/rootPropertyInit');

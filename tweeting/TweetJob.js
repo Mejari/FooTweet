@@ -3,46 +3,59 @@ var twitterService = require('./twitterService'),
     accountManagement = require('../accountmanagement/accountManagementDao'),
     qs = require('querystring');
 
+var emitTweetEvent = function(tweet) {
+    if(GLOBAL.twitterIo) {
+        var io = GLOBAL.twitterIo;
+        io.sockets.emit('tweetTweeted', tweet);
+    }
+};
+
+var constructSearchStringForAccount = function(account) {
+    var accountSearchString = account.searchString;
+    var searchString = '';
+    var searchStringArr = accountSearchString.split(',');
+    searchString += '(';
+    for(var i in searchStringArr) {
+        searchString += '"'+searchStringArr[i].trim()+'"';
+        if((searchStringArr.length-1) > i) {
+            searchString += ' OR ';
+        }
+    }
+    searchString += ') ';
+    var accountIgnoreString = account.ignoreString;
+    if(accountIgnoreString) {
+        var ignoreStringArr = accountIgnoreString.split(',');
+        for(var i in ignoreStringArr) {
+            searchString += '-"'+ignoreStringArr[i].trim()+' " ';
+        }
+    }
+    searchString += ' -RT';//Never respond to a re-tweet. This might be pulled out into a root property later
+    if(GLOBAL.debug_tweets) {
+        console.log("Search String for " + account.name + ": "+searchString);
+    }
+
+    return encodeSearchString(searchString);
+};
+
+var encodeSearchString = function(searchString) {
+    var tmp =  qs.escape(searchString);
+    tmp = tmp.replace(/!/g,'%21');
+    tmp = tmp.replace(/\*/g,'%2A');
+    tmp = tmp.replace(/\(/g,'%28');
+    tmp = tmp.replace(/\)/g,'%29');
+    tmp = tmp.replace(/'/g,'%27');
+    return tmp;
+};
+
+var shouldRespondToTweet = function(tweet, account) {
+    var shouldRespond = true;
+    //Make sure search string is actually contained in result, without punctuation in the way.
+    shouldRespond = shouldRespond && tweet.text.toLowerCase().indexOf(account.searchString.toLowerCase()) >= 0;
+
+    return shouldRespond;
+};
+
 var TwitterJob = (function() {
-
-    var constructSearchStringForAccount = function(account) {
-        var accountSearchString = account.searchString;
-        var searchString = '';
-        var searchStringArr = accountSearchString.split(',');
-        searchString += '(';
-        for(var i in searchStringArr) {
-            searchString += '"'+searchStringArr[i].trim()+'"';
-            if((searchStringArr.length-1) > i) {
-                searchString += ' OR ';
-            }
-        }
-        searchString += ') ';
-        var accountIgnoreString = account.ignoreString;
-        if(accountIgnoreString) {
-            var ignoreStringArr = accountIgnoreString.split(',');
-            for(var i in ignoreStringArr) {
-                searchString += '-"'+ignoreStringArr[i].trim()+' " ';
-            }
-        }
-        searchString += ' -RT';//Never respond to a re-tweet. This might be pulled out into a root property later
-        if(GLOBAL.debug_tweets) {
-            console.log("Search String for " + account.name + ": "+searchString);
-        }
-
-        return encodeSearchString(searchString);
-
-    };
-
-    var encodeSearchString = function(searchString) {
-        var tmp =  qs.escape(searchString);
-        tmp = tmp.replace(/!/g,'%21');
-        tmp = tmp.replace(/\*/g,'%2A');
-        tmp = tmp.replace(/\(/g,'%28');
-        tmp = tmp.replace(/\)/g,'%29');
-        tmp = tmp.replace(/'/g,'%27');
-        return tmp;
-    };
-
     function create( account ) {
         var runJob = function() {
             if(GLOBAL.debug_tweets) {
@@ -63,7 +76,10 @@ var TwitterJob = (function() {
                     if(!maxId) {
                         maxId = status.id_str;
                     }
-                    twitterService.respondToTweet(status, account);
+                    if(shouldRespondToTweet(status, account)) {
+                        twitterService.respondToTweet(status, account, emitTweetEvent);
+//                        emitTweetEvent(status);
+                    }
                 }
             }
             this.stop();
