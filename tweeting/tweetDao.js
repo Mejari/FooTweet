@@ -21,7 +21,7 @@ var tweetAlreadyExistsForAccount = function(account, tweet, callback) {
 };
 
 var tweetDaoErrorHandler = function(error) {
-    if(error.indexOf("ER_DUP_ENTRY") < 0) {
+    if(error && (!(error instanceof String) || error.indexOf("ER_DUP_ENTRY") < 0)) {
         console.log("Error in Tweet dao: " + error);
     }
 }
