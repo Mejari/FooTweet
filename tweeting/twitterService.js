@@ -87,20 +87,27 @@ var constructResponseTextForAccount = function(tweet, account) {
 };
 
 var loadExistingTweetsIntoDB = function(account, callback) {
+    callback = callback || function() {};
     getTweetsForAccount(account, function(statuses) {
         if(statuses) {
             var numTweets = statuses.length;
-            var numSaved = 0;
-            var saveCallback = function() {
-                numSaved++;
-                if(numSaved >= numTweets) {
-                    callback();
-                }
-            };
-            statuses.forEach(function(searchedTweet) {
-                var userScreenName = getMentionedUsernameFromTweet(searchedTweet);
-                tweetDao.saveTweet(userScreenName, account, saveCallback, saveCallback);
-            });
+            if(numTweets == 0) {
+                callback();
+            } else {
+                var numSaved = 0;
+                var saveCallback = function() {
+                    numSaved++;
+                    if(numSaved >= numTweets) {
+                        callback();
+                    }
+                };
+                statuses.forEach(function(searchedTweet) {
+                    var userScreenName = getMentionedUsernameFromTweet(searchedTweet);
+                    tweetDao.saveTweet(userScreenName, account, saveCallback, saveCallback);
+                });
+            }
+        } else {
+            callback();
         }
     });
 };

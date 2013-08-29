@@ -6,6 +6,7 @@ var accountManagementDao = require('../accountmanagement/accountManagementDao'),
 var ACTIVE_TWEET_JOBS = {};
 
 var restartAutomaticTweetsForAccount = function(account) {
+    console.log('starting automatic tweets for account: ' + account.name);
     var accountTweetJob = ACTIVE_TWEET_JOBS[account.name];
     if(accountTweetJob) {
         accountTweetJob.stop();
