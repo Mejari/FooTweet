@@ -57,21 +57,23 @@ var shouldRespondToTweet = function(tweet, account) {
 
 var TwitterJob = (function() {
     function create( account ) {
-        var runJob = function() {
+        var
+        runJob = function() {
             if(GLOBAL.debug_tweets) {
                 GLOBAL.logger.log('Running sync for account: '+account.name);
             }
             //Return 2x the number of tweets we want in case there are tweets that do not fit our criteria and are skipped
             twitterService.searchTweets(this.searchString, this.numTweetsPerSearch * 2, account, handleSearchResults.bind(this));
-        };
+            },
 
-        var stop = function() {
+        stop = function() {
             clearInterval(this.intervalId);
-        };
+        },
 
-        var  handleSearchResults = function(statuses) {
+        handleSearchResults = function(statuses) {
             var maxId = null, numTweetsTweeted = 0;
             if(statuses){
+                statuses = statuses.sort(sortStatuses);
                 for(var i in statuses) {
                     if(numTweetsTweeted > this.numTweetsPerSearch) {
                         break;
@@ -93,7 +95,14 @@ var TwitterJob = (function() {
             if(GLOBAL.debug_tweets) {
                 GLOBAL.logger.log('Sync complete for account: '+account.name);
             }
+        },
+
+        sortStatuses = function(statusOne, statusTwo) {
+            var a = new Date(statusOne.created_at);
+            var b = new Date(statusTwo.created_at);
+            return a<b?-1:a>b?1:0;
         };
+
 
         return {
             start: function() {

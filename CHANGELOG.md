@@ -1,6 +1,8 @@
 Changelog
 ---------
 
+* 0.1.1
+    * Sorting new statuses by created-date, oldest first so that we don't miss old tweets with new limiting option
 
 * 0.1.0
     * Upgraded to the latest versions of:
