@@ -15,7 +15,7 @@ var updateRootProperties = function(newPropertyValues, callback) {
 };
 
 var rootManagementErrorHandler = function(error) {
-    console.log("Error with root properties: "+error);
+    GLOBAL.logger.log("Error with root properties: "+error);
 }
 
 module.exports = {

@@ -3,6 +3,12 @@ FooTweet
 
 Node App for managing multiple Twitter bots that will search for and reply to a given search string. **THIS IS NOT FOR SPAMMING**. The goal of this project was to create an easy way to manage some novelty Twitter accounts, this is not built for nor encouraging of spamming people for any reason. The code in this app will never tweet the same person more than once and has limitations on what it will reply to in order to reduce it's spammy-ness.
 
+Changelog
+---------
+
+[Changelog](CHANGELOG.md)
+
+
 Requirements
 ------------
 
@@ -52,8 +58,10 @@ Future Features
 ---------------
 - More root settings
  - Toggle debug mode from here
- - Maximum number of tweets per search (to get around some spamming issues)
+ - Whether or not to allow responding to retweets
  - Enter DB settings in the app
+ - Reload root settings for active jobs when saved
+- Hook up debug logging triggers to jog4js
 - Pretty everything up
 - Put something useful on the main page
  - Statistics about each active account maybe?

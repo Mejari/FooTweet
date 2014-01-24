@@ -24,7 +24,7 @@ var createOrUpdateAccount = function(account, callback) {
 };
 
 var accountManagementErrorHandler = function(error) {
-    console.log("Error in Account Management: " + error)
+    GLOBAL.logger.log("Error in Account Management: " + error)
 };
 
 module.exports = {

@@ -1,19 +1,22 @@
 var NotFound = require('./NotFound');
 var setupErrorHandlers = function(server) {
-    server.error(function(err, req, res, next){
+    server.use(function(err, req, res, next){
         if (err instanceof NotFound) {
-            res.render('404.jade', { locals: {
+            res.status(404);
+            res.render('404.jade', {
                 title : '404 - Not Found'
                 ,description: err.toString()
                 ,author: ''
-            },status: 404 });
+            });
         } else {
-            res.render('500.jade', { locals: {
-                title : 'The Server Encountered an Error'
+            GLOBAL.logger.error(err);
+            res.status(500);
+            res.render('500.jade', {
+                title : '500 - The Server Encountered an Error'
                 ,description: err.toString()
                 ,author: ''
                 ,error: err
-            },status: 500 });
+            });
         }
     });
 };

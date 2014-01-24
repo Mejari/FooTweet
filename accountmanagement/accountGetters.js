@@ -28,7 +28,7 @@ var getAccountForName = function(accountName, callback) {
 };
 
 var accountManagementErrorHandler = function(error) {
-    console.log("Error in Account Management: " + error)
+    GLOBAL.logger.log("Error in Account Management: " + error)
 };
 
 module.exports = {

@@ -3,17 +3,20 @@ extends layout
 block content
 	div
 		h2='Currently Active Accounts'
-		if accounts.length > 0
+		if accounts && accounts.length > 0
 			ul(id='activeAccounts')
 				each account in accounts
 					li
 						a(href='/accounts/'+account.name) #{account.name}
-				li
+					li
 						a(href='/accounts/NEW') NEW
 		else
-			span(style='margin-left:30px') No Active Accounts
+			ul(id='activeAccounts', style='list-style: none;')
+				li No Active Accounts
+				li
+					a(href='/accounts/NEW') NEW
 
-		if inactiveAccounts.length > 0
+		if inactiveAccounts && inactiveAccounts.length > 0
 			h2='Inactive Accounts'
 			ul(id='inactiveAccounts')
 				each account in inactiveAccounts

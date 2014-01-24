@@ -20,9 +20,9 @@ var setupDbConnection = function() {
     }
 
     if(GLOBAL.debug_tweets === true) {
-        console.log("Config Data:");
+        GLOBAL.logger.log("Config Data:");
         Object.keys(db_config).forEach(function(key) {
-            console.log(key+": "+db_config[key]);
+            GLOBAL.logger.log(key+": "+db_config[key]);
         });
     }
 
@@ -32,7 +32,7 @@ var setupDbConnection = function() {
         dialect: 'mysql',
         logging: function(statementToLog) {
             if(GLOBAL.debug_sequelize_enabled === true) {
-                console.log(statementToLog);
+                GLOBAL.logger.log(statementToLog);
             }
         }
     });
@@ -50,7 +50,7 @@ var syncModels = function(sequelize) {
     sequelize.sync({/*force: true*/}).success(function() {
         sequelize.isSynchronized = true;
     }).error(function(error){
-        console.log('Error syncing db model: '+error);
+            GLOBAL.logger.log('Error syncing db model: '+error);
         process.exit();
     });
 };

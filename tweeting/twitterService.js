@@ -1,16 +1,17 @@
 var tweetDao = require('./tweetDao');
 
-var searchTweets = function(searchTerms, account, callback) {
+var searchTweets = function(searchTerms, numResults, account, callback) {
     var twit = account.getTwitter();
     var searchParams = {
         q: searchTerms,
         result_type: 'recent',
-        count: 50,
+        count: numResults || 50,
         include_entities: false
     };
-    if(account.lastTweetId) {
-        searchParams.since_id = account.lastTweetId;
-    }
+    //Not sure if we still want this as it conflicts with numTweetsPerSearch. Other protections against multi-tweeting should be sufficient
+//    if(account.lastTweetId) {
+//        searchParams.since_id = account.lastTweetId;
+//    }
     twit.search(searchParams, twit.access_token, twit.access_token_secret, function(err, data) {
         if(err) {
             twitterErrorHandler(err, account);
@@ -35,7 +36,7 @@ var tweetResponseCallback = function(data, account, callback) {
     if(data) {
         var responseText = data.text;
         if(GLOBAL.debug_tweets) {
-            console.log(account.name +' Tweeted: '+responseText);
+            GLOBAL.logger.log(account.name +' Tweeted: '+responseText);
         }
 
         var userScreenName = getMentionedUsernameFromTweet({text:responseText});
@@ -62,10 +63,11 @@ var respondToTweet = function(tweet, account, callback) {
             var twit = account.getTwitter();
 
             if(GLOBAL.debug_tweets === true) {
-                console.log("DEBUGGING, SKIPPING ACTUAL TWEETING");
+                GLOBAL.logger.log("DEBUGGING, SKIPPING ACTUAL TWEETING");
                 tweetResponseCallback({text: responseText}, account, callback);
 
             } else {
+                GLOBAL.logger.log("Tweeted from account " + account.name + " to " + tweet.user.screen_name);
                 twit.statuses("update", params, twit.access_token, twit.access_token_secret, function(err, data) {
                     if(err) {
                         twitterErrorHandler(err, account);
@@ -76,7 +78,7 @@ var respondToTweet = function(tweet, account, callback) {
             }
         } else {
             if(GLOBAL.debug_tweets) {
-                console.log('Skipping Tweet, already Tweeted: '+responseText);
+                GLOBAL.logger.log('Skipping Tweet, already Tweeted: '+responseText);
             }
         }
     });
@@ -117,7 +119,7 @@ var getMentionedUsernameFromTweet = function(tweet) {
 };
 
 var twitterErrorHandler = function(error, account) {
-    console.log("Error calling twitter method: "+error.statusCode+' for account: '+account.name+' --- '+error.data);
+    GLOBAL.logger.log("Error calling twitter method: "+error.statusCode+' for account: '+account.name+' --- '+error.data);
 };
 
 module.exports = {

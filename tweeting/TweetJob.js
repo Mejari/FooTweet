@@ -26,12 +26,12 @@ var constructSearchStringForAccount = function(account) {
     if(accountIgnoreString) {
         var ignoreStringArr = accountIgnoreString.split(',');
         for(var i in ignoreStringArr) {
-            searchString += '-"'+ignoreStringArr[i].trim()+' " ';
+            searchString += '-"'+ignoreStringArr[i].trim()+'" ';
         }
     }
     searchString += ' -RT';//Never respond to a re-tweet. This might be pulled out into a root property later
     if(GLOBAL.debug_tweets) {
-        console.log("Search String for " + account.name + ": "+searchString);
+        GLOBAL.logger.log("Search String for " + account.name + ": "+searchString);
     }
 
     return encodeSearchString(searchString);
@@ -59,26 +59,31 @@ var TwitterJob = (function() {
     function create( account ) {
         var runJob = function() {
             if(GLOBAL.debug_tweets) {
-                console.log('Running sync for account: '+account.name);
+                GLOBAL.logger.log('Running sync for account: '+account.name);
             }
-            twitterService.searchTweets(this.searchString, account, handleSearchResults.bind(this));
+            //Return 2x the number of tweets we want in case there are tweets that do not fit our criteria and are skipped
+            twitterService.searchTweets(this.searchString, this.numTweetsPerSearch * 2, account, handleSearchResults.bind(this));
         };
 
         var stop = function() {
             clearInterval(this.intervalId);
-        }
+        };
 
         var  handleSearchResults = function(statuses) {
-            var maxId = null;
+            var maxId = null, numTweetsTweeted = 0;
             if(statuses){
                 for(var i in statuses) {
+                    if(numTweetsTweeted > this.numTweetsPerSearch) {
+                        break;
+                    }
                     var status = statuses[i];
                     if(!maxId) {
                         maxId = status.id_str;
                     }
                     if(shouldRespondToTweet(status, account)) {
+                        numTweetsTweeted++;
                         twitterService.respondToTweet(status, account, emitTweetEvent);
-//                        emitTweetEvent(status);
+                        emitTweetEvent(status);
                     }
                 }
             }
@@ -86,7 +91,7 @@ var TwitterJob = (function() {
             this.intervalId = setInterval(runJob.bind(this), this.minutes*60*1000);
             accountManagement.createOrUpdateAccount({id: account.id, lastTweetId: maxId});
             if(GLOBAL.debug_tweets) {
-                console.log('Sync complete for account: '+account.name);
+                GLOBAL.logger.log('Sync complete for account: '+account.name);
             }
         };
 
@@ -94,6 +99,7 @@ var TwitterJob = (function() {
             start: function() {
                 rootDao.getRootProperties(function(rootProps) {
                     this.minutes = rootProps.tweetInterval;
+                    this.numTweetsPerSearch = rootProps.tweetsPerSearch;
                     this.searchString = constructSearchStringForAccount(account);
 
                     //Run immediately

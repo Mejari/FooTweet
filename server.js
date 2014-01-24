@@ -1,29 +1,37 @@
 //DEBUG OPTIONS
 GLOBAL.debug_sequelize_enabled = false;//Default: false
-GLOBAL.debug_tweets = true;//Default: false
+GLOBAL.debug_tweets = false;//Default: false
 //END DEBUG OPTIONS
-
-GLOBAL.db = require('./storage/DatabaseConnection');
 
 //setup Dependencies
 var connect = require('connect')
     , express = require('express')
-    , port = (process.env.PORT || 8081);
+    , http = require('http')
+    , port = (process.env.PORT || 8081)
+    , log4js = require('log4js');
+
+log4js.replaceConsole();
+
+GLOBAL.logger = log4js.getLogger("");
+
+
+GLOBAL.db = require('./storage/DatabaseConnection');
 
 //Setup Express
-var server = express.createServer();
-server.configure(function(){
-    server.set('views', __dirname + '/views');
-    server.set('view options', { layout: false });
-    server.use(connect.bodyParser());
-    server.use(express.cookieParser());
-    server.use(express.session({ secret: "sikujrfh8457gnfkjdng"}));
-    server.use(connect.static(__dirname + '/static'));
-    server.use(server.router);
+var app = express();
+var server = http.createServer(app);
+app.configure(function(){
+    app.set('views', __dirname + '/views');
+    app.set('view options', { layout: false });
+    app.use(connect.bodyParser());
+    app.use(express.cookieParser());
+    app.use(express.session({ secret: "sikujrfh8457gnfkjdng"}));
+    app.use(connect.static(__dirname + '/static'));
+    app.use(app.router);
 });
 
-require('./errors').setupErrorHandlers(server);
-require('./routes').setupRoutes(server);
+require('./errors').setupErrorHandlers(app);
+require('./routes').setupRoutes(app);
 
 server.listen(port);
 
@@ -34,5 +42,5 @@ require('./dbHelper').callbackWhenDbReady(function() {
     require('./rootmanagement/rootPropertyInit');
     require('./tweeting/automaticTwitterService').startAutomaticTweetsForActiveAccounts();
 
-    console.log('Listening on http://0.0.0.0:' + port );
+    GLOBAL.logger.log('Listening on http://0.0.0.0:' + port );
 });
