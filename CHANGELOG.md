@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+* 0.1.2
+    * Increasing amount of past tweets loaded on startup to further avoid double-tweeting users.
+
 * 0.1.1
     * Sorting new statuses by created-date, oldest first so that we don't miss old tweets with new limiting option
 

@@ -1,6 +1,8 @@
 var tweetDao = require('./tweetDao');
 
-var searchTweets = function(searchTerms, numResults, account, callback) {
+var
+
+searchTweets = function(searchTerms, numResults, account, callback) {
     var twit = account.getTwitter();
     var searchParams = {
         q: searchTerms,
@@ -19,20 +21,20 @@ var searchTweets = function(searchTerms, numResults, account, callback) {
         }
         callback(data.statuses);
     });
-};
+},
 
-var getTweetsForAccount = function(account, callback) {
+getTweetsForAccount = function(account, callback) {
     var twit = account.getTwitter();
-    twit.getTimeline("user_timeline", {screen_name: account.name}, twit.access_token, twit.access_token_secret, function(err, data) {
+    twit.getTimeline("user_timeline", {screen_name: account.name, count: 100}, twit.access_token, twit.access_token_secret, function(err, data) {
         if(err) {
             twitterErrorHandler(err, account);
             return;
         }
         callback(data);
     });
-};
+},
 
-var tweetResponseCallback = function(data, account, callback) {
+tweetResponseCallback = function(data, account, callback) {
     if(data) {
         var responseText = data.text;
         if(GLOBAL.debug_tweets) {
@@ -43,10 +45,10 @@ var tweetResponseCallback = function(data, account, callback) {
         tweetDao.saveTweet(userScreenName, account);
     }
     callback(data);
-};
+},
 
 
-var respondToTweet = function(tweet, account, callback) {
+respondToTweet = function(tweet, account, callback) {
     callback = callback || function(){};
     var responseText = constructResponseTextForAccount(tweet, account);
 
@@ -82,20 +84,18 @@ var respondToTweet = function(tweet, account, callback) {
             }
         }
     });
-};
+},
 
-var constructResponseTextForAccount = function(tweet, account) {
+constructResponseTextForAccount = function(tweet, account) {
     return (tweet ? ('@'+tweet.user.screen_name+ ' ') : '') +account.responseString;
-};
+},
 
-var loadExistingTweetsIntoDB = function(account, callback) {
+loadExistingTweetsIntoDB = function(account, callback) {
     callback = callback || function() {};
     getTweetsForAccount(account, function(statuses) {
         if(statuses) {
             var numTweets = statuses.length;
-            if(numTweets == 0) {
-                callback();
-            } else {
+            if(numTweets != 0) {
                 var numSaved = 0;
                 var saveCallback = function() {
                     numSaved++;
@@ -107,18 +107,18 @@ var loadExistingTweetsIntoDB = function(account, callback) {
                     var userScreenName = getMentionedUsernameFromTweet(searchedTweet);
                     tweetDao.saveTweet(userScreenName, account, saveCallback, saveCallback);
                 });
+                return;
             }
-        } else {
-            callback();
         }
+        callback();
     });
-};
+},
 
-var getMentionedUsernameFromTweet = function(tweet) {
+getMentionedUsernameFromTweet = function(tweet) {
     return tweet.text.indexOf('@') == 0 ? (tweet.text.split(' ')[0].substr(1)) : null;
-};
+},
 
-var twitterErrorHandler = function(error, account) {
+twitterErrorHandler = function(error, account) {
     GLOBAL.logger.log("Error calling twitter method: "+error.statusCode+' for account: '+account.name+' --- '+error.data);
 };
 

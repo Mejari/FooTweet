@@ -62,8 +62,8 @@ var TwitterJob = (function() {
             if(GLOBAL.debug_tweets) {
                 GLOBAL.logger.log('Running sync for account: '+account.name);
             }
-            //Return 2x the number of tweets we want in case there are tweets that do not fit our criteria and are skipped
-            twitterService.searchTweets(this.searchString, this.numTweetsPerSearch * 2, account, handleSearchResults.bind(this));
+            //Return 10x the number of tweets we want in case there are tweets that do not fit our criteria and are skipped
+            twitterService.searchTweets(this.searchString, this.numTweetsPerSearch * 10, account, handleSearchResults.bind(this));
             },
 
         stop = function() {
