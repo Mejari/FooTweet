@@ -12,7 +12,11 @@ var connect = require('connect')
 
 log4js.replaceConsole();
 
-GLOBAL.logger = log4js.getLogger("");
+log4js.loadAppender('file');
+
+log4js.addAppender(log4js.appenders.file('logs/footweet.log'), 'footweet');
+
+GLOBAL.logger = log4js.getLogger('footweet');
 
 
 GLOBAL.db = require('./storage/DatabaseConnection');

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+* 0.1.4
+    * Added logging file
+
 * 0.1.3
     * Fixed limiting tweets not taking into account existing tweets
     * Fixed cross-operating system file path delimiter issue
