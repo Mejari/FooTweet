@@ -6,11 +6,7 @@ var accountManagementDao = require('../accountmanagement/accountManagementDao'),
 var ACTIVE_TWEET_JOBS = {};
 
 var restartAutomaticTweetsForAccount = function(account) {
-    var accountTweetJob = ACTIVE_TWEET_JOBS[account.name];
-    if(accountTweetJob) {
-        accountTweetJob.stop();
-        delete ACTIVE_TWEET_JOBS[account.name];
-    }
+    stopTweetsForAccount(account);
     startAutomaticTweetsForAccount(account);
 }
 
@@ -33,9 +29,18 @@ var startAutomaticTweetsForActiveAccounts = function() {
             }
         });
     });
+},
+
+stopTweetsForAccount = function(account) {
+    var accountTweetJob = ACTIVE_TWEET_JOBS[account.name];
+    if(accountTweetJob) {
+        accountTweetJob.stop();
+        delete ACTIVE_TWEET_JOBS[account.name];
+    }
 };
 
 module.exports = {
     startAutomaticTweetsForActiveAccounts: startAutomaticTweetsForActiveAccounts,
-    restartAutomaticTweetsForAccount: restartAutomaticTweetsForAccount
+    restartAutomaticTweetsForAccount: restartAutomaticTweetsForAccount,
+    stopTweetsForAccount: stopTweetsForAccount
 };

@@ -5,5 +5,6 @@ module.exports = {
     getActiveAccounts: accountGetters.getActiveAccounts,
     getDisabledAccounts: accountGetters.getDisabledAccounts,
     getAccountForName: accountGetters.getAccountForName,
-    createOrUpdateAccount: accountSetters.createOrUpdateAccount
+    createOrUpdateAccount: accountSetters.createOrUpdateAccount,
+    deleteAccount: accountSetters.deleteAccount
 };

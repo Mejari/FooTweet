@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+* 0.1.3
+    * Fixed limiting tweets not taking into account existing tweets
+    * Fixed cross-operating system file path delimiter issue
+    * Added ability to remove accounts
+    * Removed deprecated lastTweetId code
+    * Fixed errors when the same user's tweets matches multiple accounts (requires database reset)
+    * Replaced tab characters with spaces in jade templates (because I like it better that way)
+    * Fixed multiple "NEW" options appearing when multiple accounts are set up
+
 * 0.1.2
     * Increasing amount of past tweets loaded on startup to further avoid double-tweeting users.
 

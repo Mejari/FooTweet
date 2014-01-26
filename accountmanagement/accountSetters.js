@@ -1,7 +1,8 @@
 var db = GLOBAL.db;
 
-var createAccount = function(account, twitterAuth, callback) {
+var createAccount = function(account, callback) {
     delete account.id;
+    callback = callback || function(){};
     db.Account.create(account).success(callback).error(accountManagementErrorHandler);
 };
 
@@ -23,10 +24,18 @@ var createOrUpdateAccount = function(account, callback) {
     }
 };
 
+var deleteAccount = function(account, callback) {
+    callback = callback || function(){};
+    if(account && account.id) {
+        account.destroy().success(callback).error(accountManagementErrorHandler);
+    }
+};
+
 var accountManagementErrorHandler = function(error) {
     GLOBAL.logger.log("Error in Account Management: " + error)
 };
 
 module.exports = {
-    createOrUpdateAccount: createOrUpdateAccount
+    createOrUpdateAccount: createOrUpdateAccount,
+    deleteAccount: deleteAccount
 };

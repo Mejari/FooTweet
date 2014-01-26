@@ -25,8 +25,6 @@ module.exports = function(sequelize, DataTypes) {
         responseString: {type: DataTypes.STRING(160), allowNull: false, validate: {
             len: [0,161]
         }},
-        //Details About The Account's Activity in the System
-        lastTweetId: DataTypes.STRING,
         //Details About the Twitter Authentication for the Account
         consumerKey: DataTypes.STRING,
         consumerSecret: DataTypes.STRING,

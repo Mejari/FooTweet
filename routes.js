@@ -83,7 +83,7 @@ server.post('/accounts/:accountName', function(req, res) {
         accountManagementDao.getAccountForName(savedAccount.name, function(account) {
             automaticTwitterService.restartAutomaticTweetsForAccount(account);
         });
-        renderAccountInfoForm(savedAccount.name, res);
+        res.redirect('accounts');
     });
 });
 
@@ -103,6 +103,16 @@ server.get('/accounts', function(req, res){
     });
 });
 
+//This should be a DELETE not a GET but I don't know enough about all this yet to set this up correctly
+server.get('/accounts/:accountName/delete', function(req, res) {
+    var accountName = req.params.accountName;
+    accountManagementDao.getAccountForName(accountName, function(account) {
+        automaticTwitterService.stopTweetsForAccount(account);
+        accountManagementDao.deleteAccount(account, function() {
+            res.redirect('accounts');
+        });
+    });
+});
 
 //A Route for Creating a 500 Error
 server.get('/500', function(req, res){

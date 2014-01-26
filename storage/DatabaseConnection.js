@@ -1,6 +1,7 @@
 var Sequelize = require('sequelize-mysql').sequelize
     , mysql     = require('sequelize-mysql').mysql
-    , fs = require('fs');
+    , fs = require('fs')
+    , path = require('path');
 
 var setupDbConnection = function() {
     var db_config = {
@@ -10,7 +11,7 @@ var setupDbConnection = function() {
         password: null
     };
 
-    var data = fs.readFileSync('./database.conf', 'utf8');
+    var data = fs.readFileSync(path.resolve('database.conf'), 'utf8');
     var lines = data.split(/\r?\n/);
     for(var i=0; i < lines.length; i++) {
         var keyValue = lines[i].split('=');
@@ -47,7 +48,7 @@ var extendSequelize = function(sequelize) {
 };
 
 var syncModels = function(sequelize) {
-    sequelize.sync({/*force: true*/}).success(function() {
+    sequelize.sync(/*{force: true}*/).success(function() {
         sequelize.isSynchronized = true;
     }).error(function(error){
             GLOBAL.logger.log('Error syncing db model: '+error);
@@ -56,7 +57,8 @@ var syncModels = function(sequelize) {
 };
 
 var importModel = function(conn, modelName) {
-    return conn.import(__dirname+"\\..\\models\\"+modelName);
+    var modelLocation = path.resolve(__dirname,'..','models',modelName);
+    return conn.import(modelLocation);
 }
 
 var populateDbModels = function(conn) {

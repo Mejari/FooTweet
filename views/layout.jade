@@ -1,28 +1,30 @@
 doctype html
 //if IE 7
-	html.no-js.ie7.oldie(lang='en')
+    html.no-js.ie7.oldie(lang='en')
 //if IE 8
-	html.no-js.ie8.oldie(lang='en')
+    html.no-js.ie8.oldie(lang='en')
 //[if gt IE 8]><!
 html.no-js(lang='en')
-	//<![end if]
-	head
-		meta(charset='utf-8')
-		meta(http-equiv='X-UA-Compatible', content='IE=edge,chrome=1')
-		title=title
-		meta(name="description", content=description)
-		meta(name="author", content=author)
-		meta(name="viewport", content='width=device-width, initial-scale=1')
-		link(rel='stylesheet', href='/css/style.css')
-	body
-	block header
-		header
-			if locals.backHref
-				a(href=backHref) <- Back
-				br
+    //<![end if]
+    head
+        meta(charset='utf-8')
+        meta(http-equiv='X-UA-Compatible', content='IE=edge,chrome=1')
+        title=title
+        meta(name="description", content=description)
+        meta(name="author", content=author)
+        meta(name="viewport", content='width=device-width, initial-scale=1')
+        link(rel='stylesheet', href='/css/style.css')
+    block additionalhead
+    
+    body
+    block header
+        header
+            if locals.backHref
+                a(href=backHref) <- Back
+                br
 
-	block content
+    block content
 
-	block footer
-		footer
-			script(src='//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js')
+    block footer
+        footer
+            script(src='//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js')

@@ -7,6 +7,7 @@ $(document).ready(function() {
             var listEntry = '<li>';
             if(tweet.user) {
                 listEntry += '<img width="20px" style="margin:5px;" src="'+tweet.user.profile_image_url+'"/>';
+                listEntry += '@'+tweet.user.screen_name + ':&nbsp;';
             }
             listEntry += tweet.text + '</li>';
             $('#tweets').append(listEntry);

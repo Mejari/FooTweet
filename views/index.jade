@@ -1,16 +1,16 @@
 extends layout
 
 block content
-	div
-		a(href='/accounts')='Manage Accounts'
-		span=' --- '
-		a(href='/root')='Root Settings'
-	div
-		h2 Latest Tweets
-		ul(id='tweets')
+    div
+        a(href='/accounts')='Manage Accounts'
+        span=' --- '
+        a(href='/root')='Root Settings'
+    div
+        h2 Latest Tweets
+        ul(id='tweets')
 
 block footer
-	footer
-		script(defer, src='/js/io.js')
-		script(src='//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js')
-		script(defer, src='/socket.io/socket.io.js')
+    footer
+        script(defer, src='/js/io.js')
+        script(src='//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js')
+        script(defer, src='/socket.io/socket.io.js')

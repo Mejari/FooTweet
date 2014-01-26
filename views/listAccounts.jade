@@ -1,24 +1,28 @@
 extends layout
 
-block content
-	div
-		h2='Currently Active Accounts'
-		if accounts && accounts.length > 0
-			ul(id='activeAccounts')
-				each account in accounts
-					li
-						a(href='/accounts/'+account.name) #{account.name}
-					li
-						a(href='/accounts/NEW') NEW
-		else
-			ul(id='activeAccounts', style='list-style: none;')
-				li No Active Accounts
-				li
-					a(href='/accounts/NEW') NEW
+mixin account(account)
+    li
+        a(href='/accounts/'+account.name) #{account.name}
+        span &nbsp;&nbsp;-&nbsp;&nbsp;
+        a(href='/accounts/'+account.name+'/delete', class='delete-account-icon') X
 
-		if inactiveAccounts && inactiveAccounts.length > 0
-			h2='Inactive Accounts'
-			ul(id='inactiveAccounts')
-				each account in inactiveAccounts
-					li
-						a(href='/accounts/'+account.name) #{account.name}
+block content
+    div
+        h2='Currently Active Accounts'
+        if accounts && accounts.length > 0
+            ul(id='activeAccounts')
+                each account in accounts
+                    +account(account)
+                li
+                    a(href='/accounts/NEW') NEW
+        else
+            ul(id='activeAccounts', style='list-style: none;')
+                li No Active Accounts
+                li
+                    a(href='/accounts/NEW') NEW
+
+        if inactiveAccounts && inactiveAccounts.length > 0
+            h2='Inactive Accounts'
+            ul(id='inactiveAccounts')
+                each account in inactiveAccounts
+                    +account(account)

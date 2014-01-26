@@ -59,42 +59,45 @@ var TwitterJob = (function() {
     function create( account ) {
         var
         runJob = function() {
-            if(GLOBAL.debug_tweets) {
-                GLOBAL.logger.log('Running sync for account: '+account.name);
-            }
+            GLOBAL.logger.log('Running sync for account: '+account.name);
             //Return 10x the number of tweets we want in case there are tweets that do not fit our criteria and are skipped
             twitterService.searchTweets(this.searchString, this.numTweetsPerSearch * 10, account, handleSearchResults.bind(this));
-            },
+        },
 
         stop = function() {
             clearInterval(this.intervalId);
         },
 
         handleSearchResults = function(statuses) {
-            var maxId = null, numTweetsTweeted = 0;
+            var tweetCountObject = {
+                numTweetsTweeted: 0,
+                numTweetsPerSearch: this.numTweetsPerSearch,
+                hitTweetLimit: function() {
+                    return tweetCountObject.numTweetsTweeted > tweetCountObject.numTweetsPerSearch;
+                }
+            };
             if(statuses){
                 statuses = statuses.sort(sortStatuses);
                 for(var i in statuses) {
-                    if(numTweetsTweeted > this.numTweetsPerSearch) {
+                    if(tweetCountObject.hitTweetLimit()) {
                         break;
                     }
                     var status = statuses[i];
-                    if(!maxId) {
-                        maxId = status.id_str;
-                    }
                     if(shouldRespondToTweet(status, account)) {
-                        numTweetsTweeted++;
-                        twitterService.respondToTweet(status, account, emitTweetEvent);
+                        twitterService.respondToTweet({
+                            status: status,
+                            account: account,
+                            tweetCountObject: tweetCountObject
+                        }, function() {
+
+                        });
                         emitTweetEvent(status);
                     }
                 }
             }
             this.stop();
             this.intervalId = setInterval(runJob.bind(this), this.minutes*60*1000);
-            accountManagement.createOrUpdateAccount({id: account.id, lastTweetId: maxId});
-            if(GLOBAL.debug_tweets) {
-                GLOBAL.logger.log('Sync complete for account: '+account.name);
-            }
+            GLOBAL.logger.log('Sync complete for account: '+account.name);
         },
 
         sortStatuses = function(statusOne, statusTwo) {

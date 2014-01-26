@@ -1,14 +1,14 @@
 extends layout
 
 block content
-	div
-		h2='Root Properties'
-		form(method='post', action='')
-			div
-				label(for='name') Tweet Interval (Minutes):
-				input(type='text', name='tweetInterval', id='tweetInterval', value=properties.tweetInterval)
-			div
-				label(for='name') Number of Tweets per Search:
-				input(type='text', name='tweetsPerSearch', id='tweetsPerSearch', value=properties.tweetsPerSearch)
-			div
-				input(type='submit',name='submit',value='Save').submit-button
+    div
+        h2='Root Properties'
+        form(method='post', action='')
+            div
+                label(for='name') Tweet Interval (Minutes):
+                input(type='text', name='tweetInterval', id='tweetInterval', value=properties.tweetInterval)
+            div
+                label(for='name') Number of Tweets per Search:
+                input(type='text', name='tweetsPerSearch', id='tweetsPerSearch', value=properties.tweetsPerSearch)
+            div
+                input(type='submit',name='submit',value='Save').submit-button

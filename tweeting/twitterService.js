@@ -10,10 +10,6 @@ searchTweets = function(searchTerms, numResults, account, callback) {
         count: numResults || 50,
         include_entities: false
     };
-    //Not sure if we still want this as it conflicts with numTweetsPerSearch. Other protections against multi-tweeting should be sufficient
-//    if(account.lastTweetId) {
-//        searchParams.since_id = account.lastTweetId;
-//    }
     twit.search(searchParams, twit.access_token, twit.access_token_secret, function(err, data) {
         if(err) {
             twitterErrorHandler(err, account);
@@ -48,8 +44,11 @@ tweetResponseCallback = function(data, account, callback) {
 },
 
 
-respondToTweet = function(tweet, account, callback) {
+respondToTweet = function(options, callback) {
     callback = callback || function(){};
+    var tweet = options.status,
+        account = options.account,
+        tweetCountObject = options.tweetCountObject || {};
     var responseText = constructResponseTextForAccount(tweet, account);
 
     //Don't ever tweet the same thing to the same person
@@ -64,6 +63,11 @@ respondToTweet = function(tweet, account, callback) {
 
             var twit = account.getTwitter();
 
+            if(tweetCountObject.hitTweetLimit && tweetCountObject.hitTweetLimit()) {
+                return;
+            }
+
+            tweetCountObject.numTweetsTweeted++;
             if(GLOBAL.debug_tweets === true) {
                 GLOBAL.logger.log("DEBUGGING, SKIPPING ACTUAL TWEETING");
                 tweetResponseCallback({text: responseText}, account, callback);
