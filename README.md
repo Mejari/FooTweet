@@ -48,8 +48,7 @@ Known Issues
 ------------
 
 - The entire thing is ugly as sin
-- Changing the Tweet Interval does not take effect until the server is restarted
-- Sometimes there is an error thrown when saving a new account. The account is saved but the redirect errors out.
+- Changing the Tweet Interval or Number of Tweets does not take effect until the server is restarted
 - Apparently IE doesn't hide an input field with `hidden=true`?
 - The searching is limited by Twitter's meager indexing. Make sure to use the `Ignore Text` field to filter out any false-positives you can think of!
 
@@ -63,6 +62,7 @@ Future Features
  - Reload root settings for active jobs when saved
 - Hook up debug logging triggers to jog4js
 - Pretty everything up
+- Form validation
 - Put something useful on the main page
  - Statistics about each active account maybe?
 - Add ability to set multiple response strings and have them chosen randomly (adds flavor plus avoid bot suspension)
